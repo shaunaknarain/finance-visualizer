@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sign in</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/finance.css" />
+  </head>
+  <body class="login-body">
+    <form id="login-form" class="card login-card">
+      <div class="login-title">Finance</div>
+      <div class="login-sub">Enter your password to continue.</div>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" autofocus />
+      <button type="submit">Sign in</button>
+      <div id="login-error" class="login-error"></div>
+    </form>
+    <script>
+      const form = document.getElementById("login-form");
+      const err = document.getElementById("login-error");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        err.textContent = "";
+        const password = document.getElementById("password").value;
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
+        if (res.ok) {
+          window.location.href = "/app";
+        } else {
+          err.textContent = "Incorrect password.";
+          document.getElementById("password").value = "";
+        }
+      });
+    </script>
+  </body>
+</html>

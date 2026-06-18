@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+*.log
+
+# Plaid keys + session secret. NEVER commit.
+.env
+
+# Plaid access tokens + cached transactions. NEVER commit.
+data/
