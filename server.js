@@ -205,6 +205,17 @@ app.get("/api/finance/overview", async (req, res) => {
     res.json(payload);
   } catch (e) {
     console.error("overview:", e.response?.data || e.message);
+    // A transient bank/Plaid outage shouldn't blank the dashboard. If we have
+    // any prior snapshot, serve it marked stale rather than hard-failing.
+    if (overviewCache.data) {
+      return res.json({
+        ...overviewCache.data,
+        cached: true,
+        stale: true,
+        staleSince: overviewCache.at,
+        warning: e.response?.data?.error_message || e.message,
+      });
+    }
     res.status(500).json({ error: "plaid_error", message: e.response?.data?.error_message || e.message });
   }
 });

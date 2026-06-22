@@ -13,7 +13,12 @@
   </head>
   <body>
     <header class="topbar">
-      <div class="brand">Finance</div>
+      <div class="topbar-left">
+        <!-- Back to the main personal site. Update to your site URL if it
+             changes (this is the public site, not the local preview). -->
+        <a class="back-link" href="https://shaunaknarain.com">← Website</a>
+        <div class="brand">Finance</div>
+      </div>
       <div class="topbar-right">
         <span id="mode-badge" class="badge"></span>
         <button id="demo-toggle" class="demo-switch" type="button" aria-pressed="false" title="Toggle demo data">
@@ -24,6 +29,8 @@
         <button id="logout-btn" class="btn btn-ghost">Log out</button>
       </div>
     </header>
+
+    <div id="stale-banner" class="stale-banner" hidden></div>
 
     <main id="app" class="wrap">
       <div id="loading" class="loading-shell" role="status" aria-live="polite">

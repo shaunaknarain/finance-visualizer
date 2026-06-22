@@ -114,6 +114,19 @@ async function loadOverview() {
     return;
   }
 
+  // surface a stale-data notice when a refresh failed and we're showing the
+  // last good snapshot (a bank/Plaid outage rather than fresh numbers)
+  const staleBanner = $("stale-banner");
+  if (staleBanner) {
+    if (data.stale) {
+      const when = data.staleSince ? new Date(data.staleSince).toLocaleString() : "earlier";
+      staleBanner.textContent = `Showing last snapshot from ${when} — a bank isn't responding right now, so live balances couldn't refresh.`;
+      staleBanner.hidden = false;
+    } else {
+      staleBanner.hidden = true;
+    }
+  }
+
   // live mode with no linked banks -> empty state
   if (!data.demo && (!data.accounts || data.accounts.length === 0)) {
     $("loading").hidden = true;

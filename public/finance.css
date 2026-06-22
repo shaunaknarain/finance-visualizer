@@ -92,7 +92,19 @@ button:active { transform: translateY(1px); }
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   border-bottom: 1px solid var(--line);
 }
+.topbar-left { display: flex; align-items: center; gap: 16px; }
 .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; }
+.back-link {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+.back-link:hover { color: var(--accent); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 
 .badge {
@@ -1062,3 +1074,18 @@ button:active { transform: translateY(1px); }
     transform: none;
   }
 }
+
+/* Stale-data notice — shown when a refresh failed and we're serving the
+   last good snapshot (transient bank/Plaid outage). */
+.stale-banner {
+  margin: 0 auto;
+  max-width: 1080px;
+  padding: 10px 16px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.stale-banner[hidden] { display: none; }
