@@ -16,7 +16,7 @@
       <div class="topbar-left">
         <!-- Back to the main personal site. Update to your site URL if it
              changes (this is the public site, not the local preview). -->
-        <a class="back-link" href="https://shaunaknarain.com">← Website</a>
+        <a class="back-link" id="back-link" href="https://shaunaknarain.com">← Website</a>
         <div class="brand">Finance</div>
       </div>
       <div class="topbar-right">
@@ -221,5 +221,17 @@
     </main>
 
     <script src="/finance.js"></script>
+    <script>
+      // While iterating locally, point "← Website" at the local site preview
+      // (localhost:5500) instead of production. Anywhere else it stays the
+      // real site. (localhost:4000/ itself redirects to /app, so we link out.)
+      (function () {
+        const h = location.hostname;
+        if (h === "localhost" || h === "127.0.0.1") {
+          const bl = document.getElementById("back-link");
+          if (bl) bl.href = "http://localhost:5500";
+        }
+      })();
+    </script>
   </body>
 </html>
