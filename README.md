@@ -1,10 +1,10 @@
 # Finance Visualizer
 
-Hey! I built this personal finance dashboard as a quick and easy way to get a holistic understanding of your finances via Plaid API.. It pulls checking, credit card and
+Hey! I built this personal finance dashboard as a quick and easy way to get a holistic understanding of your finances via Plaid API. It pulls checking, credit card and
 brokerage accounts into one place through Plaid API, then breaks down net worth,
 spending by category and merchant, paychecks and investment holdings.
 
-Note: You need to apply for a plaid api via their developer portal. https://plaid.com/docs/api/
+Note: You need to apply for a Plaid api via their developer portal. https://plaid.com/docs/api/
 
 **Check out a demo here::** https://shaunaknarain.com/finance-demo/
 
