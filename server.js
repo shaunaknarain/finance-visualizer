@@ -102,7 +102,11 @@ app.get("/api/status", (req, res) => {
 app.post("/api/plaid/create_link_token", async (req, res) => {
   if (DEMO_MODE) return res.status(400).json({ error: "demo", message: "Add Plaid keys to .env to link a real bank." });
   try {
-    const link_token = await plaid.createLinkToken("local-user");
+    // { item_id } => update mode for a bank whose login expired
+    const itemId = req.body?.item_id;
+    const item = itemId ? store.getItem(itemId) : null;
+    if (itemId && !item) return res.status(404).json({ error: "unknown_item", message: "That bank isn't linked." });
+    const link_token = await plaid.createLinkToken("local-user", item?.access_token);
     res.json({ link_token });
   } catch (e) {
     console.error("create_link_token:", e.response?.data || e.message);
@@ -150,18 +154,36 @@ function applyNicknames(accounts) {
 async function computeLiveOverview() {
   const items = store.listItems();
 
+  // A bank that needs a re-login shouldn't take down the whole dashboard:
+  // fall back to its last good snapshot and flag it for reconnecting.
+  const needsReconnect = [];
   const perItem = await Promise.all(
     items.map(async (item) => {
-      const [accts, holdings, delta] = await Promise.all([
-        plaid.getAccounts(item.access_token),
-        plaid.getHoldings(item.access_token),
-        plaid.syncTransactions(item.access_token, item.cursor),
-      ]);
-      store.applyTransactionDelta(item.item_id, delta);
-      return {
-        accounts: accts.map((a) => ({ ...a, institution: item.institution_name })),
-        holdings: holdings ? { ...holdings, institution: item.institution_name } : null,
-      };
+      try {
+        const [accts, holdings, delta] = await Promise.all([
+          plaid.getAccounts(item.access_token),
+          plaid.getHoldings(item.access_token),
+          plaid.syncTransactions(item.access_token, item.cursor),
+        ]);
+        store.applyTransactionDelta(item.item_id, delta);
+        store.saveItemSnapshot(item.item_id, { accounts: accts, holdings });
+        return {
+          accounts: accts.map((a) => ({ ...a, institution: item.institution_name })),
+          holdings: holdings ? { ...holdings, institution: item.institution_name } : null,
+        };
+      } catch (e) {
+        if (!plaid.needsRelink(e)) throw e;
+        needsReconnect.push({
+          item_id: item.item_id,
+          institution: item.institution_name,
+          lastSync: item.last_sync_at || null,
+        });
+        const accts = item.last_accounts || [];
+        return {
+          accounts: accts.map((a) => ({ ...a, institution: item.institution_name })),
+          holdings: item.last_holdings ? { ...item.last_holdings, institution: item.institution_name } : null,
+        };
+      }
     })
   );
 
@@ -182,7 +204,7 @@ async function computeLiveOverview() {
 
   const ov = buildOverview(accounts, transactions);
   applyNicknames(ov.accounts);
-  return { demo: false, linkedBanks: items.length, ...ov, holdings: normalizeHoldings(holdingSources) };
+  return { demo: false, linkedBanks: items.length, ...ov, holdings: normalizeHoldings(holdingSources), needsReconnect };
 }
 
 app.get("/api/finance/overview", async (req, res) => {

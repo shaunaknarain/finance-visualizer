@@ -1089,3 +1089,22 @@ button:active { transform: translateY(1px); }
   line-height: 1.4;
 }
 .stale-banner[hidden] { display: none; }
+.reconnect-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.reconnect-row + .reconnect-row { margin-top: 8px; }
+.reconnect-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border: 1px solid #d97706;
+  border-radius: 8px;
+  background: #fff;
+  color: #92400e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.reconnect-btn:hover { background: #fffbeb; }

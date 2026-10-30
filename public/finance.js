@@ -127,6 +127,8 @@ async function loadOverview() {
     }
   }
 
+  renderReconnect(data.needsReconnect || []);
+
   // live mode with no linked banks -> empty state
   if (!data.demo && (!data.accounts || data.accounts.length === 0)) {
     $("loading").hidden = true;
@@ -964,6 +966,51 @@ function renderChartFallback(canvas, message) {
   const box = canvas && canvas.parentElement;
   if (!box) return;
   box.innerHTML = `<div class="chart-fallback">${escapeHtml(message)}</div>`;
+}
+
+// One row per bank whose login expired, each with a Reconnect button.
+function renderReconnect(items) {
+  const box = $("reconnect-banner");
+  if (!box) return;
+  box.innerHTML = "";
+  box.hidden = items.length === 0;
+  for (const it of items) {
+    const row = document.createElement("div");
+    row.className = "reconnect-row";
+    const since = it.lastSync ? ` Last synced ${new Date(it.lastSync).toLocaleDateString()}.` : "";
+    const msg = document.createElement("span");
+    msg.textContent = `${it.institution} needs you to log in again — its numbers may be out of date.${since}`;
+    const btn = document.createElement("button");
+    btn.className = "reconnect-btn";
+    btn.textContent = "Reconnect";
+    btn.addEventListener("click", () => reconnectBank(it.item_id));
+    row.append(msg, btn);
+    box.append(row);
+  }
+}
+
+// Plaid Link update mode: re-authenticates the existing item in place, so
+// there's no token exchange — just pull fresh data afterwards.
+async function reconnectBank(itemId) {
+  try {
+    const res = await fetch("/api/plaid/create_link_token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item_id: itemId }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.message || "Couldn't start reconnecting.");
+    const handler = Plaid.create({
+      token: body.link_token,
+      onSuccess: async () => {
+        await fetch("/api/finance/overview?refresh=1");
+        window.location.reload();
+      },
+    });
+    handler.open();
+  } catch (e) {
+    alert(e.message || "Couldn't start reconnecting.");
+  }
 }
 
 async function connectBank() {
