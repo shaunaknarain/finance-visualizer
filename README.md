@@ -1,14 +1,12 @@
 # Finance Visualizer
 
-A Mint-style personal finance dashboard. It pulls checking, credit card and
-brokerage accounts into one place through Plaid, then breaks down net worth,
+Hey! I built this personal finance dashboard as a quick and easy way to get a holistic understanding of your finances via Plaid API.. It pulls checking, credit card and
+brokerage accounts into one place through Plaid API, then breaks down net worth,
 spending by category and merchant, paychecks and investment holdings.
 
-**Live demo (fake data):** https://shaunaknarain.com/finance-demo/
+Note: You need to apply for a plaid api via their developer portal. https://plaid.com/docs/api/
 
-This copy is the demo. With no Plaid keys it serves made-up accounts from
-`lib/demo.js`, so anyone can run it. My real instance runs privately on my own
-hardware and never leaves it.
+**Check out a demo here::** https://shaunaknarain.com/finance-demo/
 
 ## What it does
 
@@ -21,14 +19,3 @@ hardware and never leaves it.
 - Survives bank outages: falls back to the last good balances, shows a stale
   banner, and offers a one-click Reconnect when a bank needs a fresh login
 - Caches the slow Plaid calls, so repeat loads are instant
-
-## Run it
-
-    npm install
-    npm start              # http://localhost:4000, demo data
-
-To point it at real banks, copy `.env.example` to `.env` and add Plaid keys.
-
-## Stack
-
-Node + Express, Plaid API, vanilla JS and Chart.js on the front end.
